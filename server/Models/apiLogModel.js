@@ -10,12 +10,14 @@ const apilogSchema=new mongoose.Schema({
         enum:["UP","DOWN"],
         required:true
     },
-    message:{
+     responseTime: {
+      type: Number,
+      default: null
+    },
+    Errormessage:{
         type:String
     },
-    checkedAt:{
-        type:Date,
-        default:Date.now()
-    }
+},{
+    timestamps:true
 })
 module.exports=mongoose.model("Apilog",apilogSchema);

@@ -60,7 +60,7 @@ router.delete("/delete/:id",async(req,res)=>{
 router.get("/:id",async(req,res)=>{
     try{
         const {id}=req.params;
-        const alllogs=await Apilogs.find({apiId:id});
+        const alllogs=await Apilogs.find({apiId:id}).sort({createdAt:-1});
         return res.status(201).json({message:"All Api logs fetched successfully.. ",Apilogs:alllogs});
     }
     catch(error){

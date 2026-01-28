@@ -7,8 +7,9 @@ const checkApi=async()=>{
     for(let api of AllApis){
         const start=Date.now();
         const prevStatus=api.status;
+        let errorM=null;
         try{
-            const response=await axios.get(api.url);
+            const response=await axios.get(api.url,{timeout:5000});
             const time=Date.now()-start;
             api.status="UP";
             api.responseTime=time;
@@ -20,6 +21,7 @@ const checkApi=async()=>{
             api.status="DOWN";
             api.responseTime=null;
             api.lastChecked=new Date();
+            errorM=error.message;
             // console.log(`Api Name is ${api.name} , api url is ${api.url} , status is ${api.status} , responsetime is ${api.responseTime} , lastChecked is ${api.lastChecked}`);
 
         }
@@ -29,7 +31,8 @@ const checkApi=async()=>{
             await Apilog.create({
                 apiId:api._id,
                 status:api.status,
-                message:api.status=="DOWN"?"Api is not reachable":"Api recovered"
+                responseTime:api.responseTime,
+                Errormessage:errorM
 
             })
             console.log("Api log created")
