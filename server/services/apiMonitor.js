@@ -8,7 +8,7 @@ const checkApi=async()=>{
         const start=Date.now();
         const prevStatus=api.status;
         try{
-            const response=await axios.get(api.url,{timeout:5000});
+            const response=await axios.get(api.url);
             const time=Date.now()-start;
             api.status="UP";
             api.responseTime=time;

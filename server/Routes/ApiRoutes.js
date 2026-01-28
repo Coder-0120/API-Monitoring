@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const Api=require("../Models/apiModel");
+const Apilogs=require("../Models/apiLogModel");
 
 // to add api in db
 router.post("/add",async(req,res)=>{
@@ -53,6 +54,17 @@ router.delete("/delete/:id",async(req,res)=>{
     }
     catch(error){
         return res.status(400).json({message:"Internal Server error"});
+    }
+})
+
+router.get("/:id",async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const alllogs=await Apilogs.find({apiId:id});
+        return res.status(201).json({message:"All Api logs fetched successfully.. ",Apilogs:alllogs});
+    }
+    catch(error){
+        return res.status(500).json({message:"Internal Server error"});
     }
 })
 
