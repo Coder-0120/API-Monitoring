@@ -15,7 +15,8 @@ const apilogSchema=new mongoose.Schema({
       default: null
     },
     Errormessage:{
-        type:String
+        type:String,
+        default:null
     },
 },{
     timestamps:true

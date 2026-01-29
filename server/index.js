@@ -5,6 +5,7 @@ const cron=require("node-cron");
 const checkApi=require("./services/apiMonitor");
 const UserRoute=require("./Routes/userRoutes");
 const ApiRoute=require("./Routes/apiRoutes");
+const ApiLogRoute=require("./Routes/ApiLogRoute");
 const app=express();
 app.use(express.json());
 app.use(cors());
@@ -18,7 +19,7 @@ app.get('/',(req,res)=>{
 })
 app.use("/api/user",UserRoute);
 app.use("/api/monitor",ApiRoute);
-app.use("/api/logs",ApiRoute);
+app.use("/api/logs",ApiLogRoute);
 app.listen(5000,()=>{
     console.log(`Server is running on port ${5000}`);
 })

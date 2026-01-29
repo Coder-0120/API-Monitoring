@@ -1,22 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ApiCard.css";
 import axios from "axios";
 import ApiLogsModal from "./ApiLogsModal";
 
 const ApiCard = ({ api }) => {
-    const[allLogs,setallLogs]=useState([]);
-    const[showLogs,setshowLogs]=useState(false);
-    const fetchAllLogs=async(apiId)=>{
-        try{
-            const allLogs=await axios.get(`http://localhost:5000/api/logs/${apiId}`);
-            setallLogs(allLogs.data.Apilogs);
-            console.log(allLogs.data.Apilogs);
-            setshowLogs(true);
-        }
-        catch(error){
-            alert("failed to fetch all logs");
-        }
+  const [allLogs, setallLogs] = useState([]);
+  const [showLogs, setshowLogs] = useState(false);
+  const[uptime,setuptime]=useState(null);
+  useEffect(()=>{
+    const fetchUptime=async()=>{
+      try{
+
+        const response=await axios.get(`http://localhost:5000/api/logs/uptime/${api._id}`)
+        setuptime(response.data.uptime);
+      }
+      catch(error){
+        console.log(error);
+      }
     }
+    fetchUptime();
+  },[api._id])
+  const fetchAllLogs = async (apiId) => {
+    try {
+      const allLogs = await axios.get(`http://localhost:5000/api/logs/${apiId}`);
+      setallLogs(allLogs.data.Apilogs);
+      console.log(allLogs.data.Apilogs);
+      setshowLogs(true);
+    }
+    catch (error) {
+      alert("failed to fetch all logs");
+    }
+  }
 
   return (
     <div className="api-card">
@@ -32,13 +46,21 @@ const ApiCard = ({ api }) => {
           ? new Date(api.lastChecked).toLocaleTimeString()
           : "Not yet"}
       </p>
-      <button id="log_btn" onClick={()=>fetchAllLogs(api._id)}>All logs</button>
+      <button id="log_btn" onClick={() => fetchAllLogs(api._id)}>All logs</button>
       <ApiLogsModal
         show={showLogs}
         logs={allLogs}
         onClose={() => setshowLogs(false)}
       />
+      <p>
+        Uptime:{" "}
+        <strong style={{ color: uptime >= 99 ? "green" : "orange" }}>
+          {uptime ?? "--"}%
+        </strong>
+      </p>
+
     </div>
+
   );
 };
 

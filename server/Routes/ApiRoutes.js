@@ -57,15 +57,5 @@ router.delete("/delete/:id",async(req,res)=>{
     }
 })
 
-router.get("/:id",async(req,res)=>{
-    try{
-        const {id}=req.params;
-        const alllogs=await Apilogs.find({apiId:id}).sort({createdAt:-1});
-        return res.status(201).json({message:"All Api logs fetched successfully.. ",Apilogs:alllogs});
-    }
-    catch(error){
-        return res.status(500).json({message:"Internal Server error"});
-    }
-})
 
 module.exports=router;
