@@ -6,20 +6,45 @@ import ApiLogsModal from "./ApiLogsModal";
 const ApiCard = ({ api }) => {
   const [allLogs, setallLogs] = useState([]);
   const [showLogs, setshowLogs] = useState(false);
-  const[uptime,setuptime]=useState(null);
-  useEffect(()=>{
-    const fetchUptime=async()=>{
-      try{
+  const [uptime, setuptime] = useState(null);
+  const [avg_resp_time, setavg_resp_time] = useState(null);
+  const [isDown, setisDown] = useState(false);
+  const [downtime, setdowntime] = useState(null);
+  useEffect(() => {
+    const fetchUptime = async () => {
+      try {
 
-        const response=await axios.get(`http://localhost:5000/api/logs/uptime/${api._id}`)
+        const response = await axios.get(`http://localhost:5000/api/logs/uptime/${api._id}`)
         setuptime(response.data.uptime);
       }
-      catch(error){
+      catch (error) {
+        console.log(error);
+      }
+    }
+    const fetchAvgRespTime = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/logs/avg_resp_time/${api._id}`);
+        setavg_resp_time(response.data.avg_resp_time);
+      }
+      catch (error) {
+        console.log(error);
+      }
+
+    }
+    const lastDownApi = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/logs/downtime/${api._id}`);
+        setisDown(response.data.isDown);
+        setdowntime(response.data.downtime);
+      }
+      catch (error) {
         console.log(error);
       }
     }
     fetchUptime();
-  },[api._id])
+    fetchAvgRespTime();
+    lastDownApi();
+  }, [api._id])
   const fetchAllLogs = async (apiId) => {
     try {
       const allLogs = await axios.get(`http://localhost:5000/api/logs/${apiId}`);
@@ -39,6 +64,10 @@ const ApiCard = ({ api }) => {
       <p >
         Status : <strong className={api.status === "UP" ? "up" : "down"}>{api.status}</strong>
       </p>
+      {isDown && (
+        <p className="down-time">Down since {downtime}</p>
+      )}
+
       <p>Response Time: {api.responseTime ?? "--"} ms</p>
       <p>
         Last Checked:{" "}
@@ -56,6 +85,12 @@ const ApiCard = ({ api }) => {
         Uptime:{" "}
         <strong style={{ color: uptime >= 99 ? "green" : "orange" }}>
           {uptime ?? "--"}%
+        </strong>
+      </p>
+      <p>
+        Avg_Resp_Time:{" "}
+        <strong style={{ color: avg_resp_time >= 99 ? "green" : "orange" }}>
+          {avg_resp_time ?? "--"} ms
         </strong>
       </p>
 

@@ -1,6 +1,7 @@
 const express=require("express");
 const router=express();
 const Apilogs=require("../Models/apiLogModel");
+const {getResponseTimeTrend}=require("../Controllers/logController");
 
 router.get("/:id",async(req,res)=>{
     try{
@@ -25,7 +26,7 @@ router.get("/uptime/:id",async(req,res)=>{
         });
         if(logs.length==0){
             return res.status(201).json({
-                uptime:100,
+                uptime:0,
                 totalChecks: 0,
                 upChecks: 0
             })
@@ -42,5 +43,86 @@ router.get("/uptime/:id",async(req,res)=>{
         return res.status(500).json({message:"Internal Server Error"});
     }
 })
+
+router.get("/avg_resp_time/:id",async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const sinceDate=new Date(Date.now()-24*60*60*1000);
+        const logs=await Apilogs.find({
+            apiId:id,
+            status:"UP",
+            responseTime:{
+                $ne:null
+            },
+            createdAt:{
+                $gte:sinceDate
+            }
+        });
+        if(logs.length==0){
+            return res.status(201).json({
+                avg_resp_time:null,
+            })
+        }
+        const sumReptime=logs.reduce((sum,log)=>sum+log.responseTime,0);
+        const avg_resp_time=Math.round(sumReptime/logs.length);
+        return res.status(201).json({
+            avg_resp_time:avg_resp_time
+        })
+    }
+    catch(error){
+        return res.status(500).json({message:"Internal Server Error"});
+    }
+})
+
+
+router.get("/downtime/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // latest DOWN log
+    const lastDown = await Apilogs.findOne({
+      apiId: id,
+      status: "DOWN"
+    }).sort({ createdAt: -1 });
+
+    if (!lastDown) {
+      return res.status(200).json({
+        isDown: false,
+        downtime: null
+      });
+    }
+
+    // check if API recovered after last DOWN
+    const recovered = await Apilogs.findOne({
+      apiId: id,
+      status: "UP",
+      createdAt: { $gt: lastDown.createdAt }
+    });
+
+    if (recovered) {
+      return res.status(200).json({
+        isDown: false,
+        downtime: null
+      });
+    }
+
+    // API is still DOWN
+    const diffMs = Date.now() - lastDown.createdAt.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffSec = Math.floor((diffMs % 60000) / 1000);
+
+    return res.status(200).json({
+      isDown: true,
+      downtime: `${diffMin}m ${diffSec}s`
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to calculate downtime"
+    });
+  }
+});
+
+router.get("/response-trend", getResponseTimeTrend);
 
 module.exports=router;
