@@ -8,8 +8,6 @@ const ApiCard = ({ api }) => {
   const [showLogs, setshowLogs] = useState(false);
   const [uptime, setuptime] = useState(null);
   const [avg_resp_time, setavg_resp_time] = useState(null);
-  const [isDown, setisDown] = useState(false);
-  const [downtime, setdowntime] = useState(null);
   useEffect(() => {
     const fetchUptime = async () => {
       try {
@@ -31,19 +29,8 @@ const ApiCard = ({ api }) => {
       }
 
     }
-    const lastDownApi = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/logs/downtime/${api._id}`);
-        setisDown(response.data.isDown);
-        setdowntime(response.data.downtime);
-      }
-      catch (error) {
-        console.log(error);
-      }
-    }
     fetchUptime();
     fetchAvgRespTime();
-    lastDownApi();
   }, [api._id])
   const fetchAllLogs = async (apiId) => {
     try {
@@ -64,9 +51,7 @@ const ApiCard = ({ api }) => {
       <p >
         Status : <strong className={api.status === "UP" ? "up" : "down"}>{api.status}</strong>
       </p>
-      {isDown && (
-        <p className="down-time">Down since {downtime}</p>
-      )}
+    
 
       <p>Response Time: {api.responseTime ?? "--"} ms</p>
       <p>
