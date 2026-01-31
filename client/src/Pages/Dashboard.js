@@ -28,6 +28,19 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Handle delete API endpoint
+  const handleDelete = async (apiId) => {
+    try {
+      // Call your backend delete endpoint
+      await axios.delete(`http://localhost:5000/api/monitor/delete/${apiId}`);
+      // Remove from state
+      setApis(apis.filter(api => api._id !== apiId));
+    } catch (error) {
+      console.error("Error deleting API:", error);
+      alert("Failed to delete endpoint. Please try again.");
+    }
+  };
+
   return (
     <>
       <style>{`
@@ -143,6 +156,7 @@ const Dashboard = () => {
         .stat-card {
           background: rgba(21, 27, 43, 0.6);
           border: 1px solid rgba(148, 163, 184, 0.1);
+          border: 1px solid rgba(167, 180, 199, 0.61);
           border-radius: 16px;
           padding: 20px;
           backdrop-filter: blur(20px);
@@ -288,6 +302,7 @@ const Dashboard = () => {
           <h1 className="dashboard-title">API Monitor Dashboard</h1>
           <p className="dashboard-subtitle">Real-time monitoring and analytics</p>
         </div>
+       
 
         <div className="dashboard-stats">
           <div className="stat-card">
@@ -340,7 +355,12 @@ const Dashboard = () => {
             ) : (
               <div className="grid">
                 {apis.map((api, index) => (
-                  <ApiCard key={api._id} api={api} index={index} />
+                  <ApiCard 
+                    key={api._id} 
+                    api={api} 
+                    index={index}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </div>
             )}

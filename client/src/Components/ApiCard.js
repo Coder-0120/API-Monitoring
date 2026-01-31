@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ApiLogsModal from "./ApiLogsModal";
 
-const ApiCard = ({ api, index }) => {
+const ApiCard = ({ api, index, onDelete }) => {
   const [allLogs, setallLogs] = useState([]);
   const [showLogs, setshowLogs] = useState(false);
   const [uptime, setuptime] = useState(null);
   const [avg_resp_time, setavg_resp_time] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const fetchUptime = async () => {
@@ -43,6 +44,13 @@ const ApiCard = ({ api, index }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(api._id);
+    }
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -96,6 +104,15 @@ const ApiCard = ({ api, index }) => {
 
         .api-card-header {
           margin-bottom: 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .header-left {
+          flex: 1;
+          min-width: 0;
         }
 
         .api-card-title {
@@ -113,6 +130,7 @@ const ApiCard = ({ api, index }) => {
           height: 10px;
           border-radius: 50%;
           animation: pulse 2s ease-in-out infinite;
+          flex-shrink: 0;
         }
 
         .status-indicator.up {
@@ -134,6 +152,32 @@ const ApiCard = ({ api, index }) => {
             opacity: 0.6;
             transform: scale(1.1);
           }
+        }
+
+        .delete-btn {
+          width: 36px;
+          height: 36px;
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 10px;
+          color: #EF4444;
+          font-size: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          flex-shrink: 0;
+        }
+
+        .delete-btn:hover {
+          background: rgba(239, 68, 68, 0.2);
+          border-color: #EF4444;
+          transform: scale(1.1);
+        }
+
+        .delete-btn:active {
+          transform: scale(0.95);
         }
 
         .api-url {
@@ -270,6 +314,120 @@ const ApiCard = ({ api, index }) => {
           opacity: 0.6;
         }
 
+        /* Delete Confirmation Modal */
+        .delete-confirm-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(11, 15, 25, 0.85);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          animation: overlayFadeIn 0.2s ease-out;
+        }
+
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .delete-confirm-box {
+          background: #151B2B;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 20px;
+          padding: 32px;
+          max-width: 420px;
+          width: 90%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .delete-confirm-icon {
+          font-size: 56px;
+          text-align: center;
+          margin-bottom: 20px;
+        }
+
+        .delete-confirm-title {
+          font-size: 22px;
+          font-weight: 700;
+          color: #F8FAFC;
+          text-align: center;
+          margin-bottom: 12px;
+        }
+
+        .delete-confirm-message {
+          font-size: 15px;
+          color: #94A3B8;
+          text-align: center;
+          margin-bottom: 28px;
+          line-height: 1.6;
+        }
+
+        .delete-confirm-message strong {
+          color: #F8FAFC;
+          font-weight: 600;
+        }
+
+        .delete-confirm-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .confirm-btn {
+          height: 48px;
+          border-radius: 12px;
+          font-size: 15px;
+          font-weight: 600;
+          font-family: 'Outfit', sans-serif;
+          cursor: pointer;
+          transition: all 0.3s;
+          border: none;
+        }
+
+        .confirm-btn.cancel {
+          background: rgba(148, 163, 184, 0.1);
+          color: #94A3B8;
+          border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .confirm-btn.cancel:hover {
+          background: rgba(148, 163, 184, 0.2);
+          border-color: #94A3B8;
+          transform: translateY(-2px);
+        }
+
+        .confirm-btn.delete {
+          background: linear-gradient(135deg, #EF4444, #DC2626);
+          color: white;
+          border: 1px solid #EF4444;
+        }
+
+        .confirm-btn.delete:hover {
+          box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+          transform: translateY(-2px);
+        }
+
+        .confirm-btn:active {
+          transform: translateY(0);
+        }
+
         /* Responsive */
         @media (max-width: 480px) {
           .api-card {
@@ -285,16 +443,33 @@ const ApiCard = ({ api, index }) => {
             align-items: flex-start;
             gap: 8px;
           }
+
+          .delete-confirm-box {
+            padding: 24px;
+          }
+
+          .delete-confirm-title {
+            font-size: 20px;
+          }
         }
       `}</style>
 
       <div className="api-card">
         <div className="api-card-header">
-          <h3 className="api-card-title">
-            <span className={`status-indicator ${api.status === "UP" ? "up" : "down"}`}></span>
-            {api.name}
-          </h3>
-          <div className="api-url">{api.url}</div>
+          <div className="header-left">
+            <h3 className="api-card-title">
+              <span className={`status-indicator ${api.status === "UP" ? "up" : "down"}`}></span>
+              {api.name}
+            </h3>
+            <div className="api-url">{api.url}</div>
+          </div>
+          <button 
+            className="delete-btn" 
+            onClick={() => setShowDeleteConfirm(true)}
+            title="Delete endpoint"
+          >
+            🗑️
+          </button>
         </div>
 
         <div className="api-card-body">
@@ -346,6 +521,34 @@ const ApiCard = ({ api, index }) => {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="delete-confirm-box" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-confirm-icon">⚠️</div>
+            <h3 className="delete-confirm-title">Delete Endpoint?</h3>
+            <p className="delete-confirm-message">
+              Are you sure you want to delete <strong>{api.name}</strong>?<br/>
+              This action cannot be undone and all historical data will be lost.
+            </p>
+            <div className="delete-confirm-actions">
+              <button 
+                className="confirm-btn cancel"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="confirm-btn delete"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ApiLogsModal
         show={showLogs}

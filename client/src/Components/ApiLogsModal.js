@@ -18,6 +18,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           z-index: 1000;
           padding: 20px;
           animation: overlayFadeIn 0.3s ease-out;
+          overflow-y: auto;
         }
 
         @keyframes overlayFadeIn {
@@ -34,7 +35,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           border: 1px solid rgba(148, 163, 184, 0.15);
           border-radius: 24px;
           width: 100%;
-          max-width: 1000px;
+          max-width: 900px;
           max-height: 85vh;
           display: flex;
           flex-direction: column;
@@ -44,6 +45,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
           overflow: hidden;
+          margin: auto;
         }
 
         @keyframes modalSlideUp {
@@ -75,6 +77,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           justify-content: space-between;
           align-items: center;
           background: rgba(30, 39, 56, 0.3);
+          flex-shrink: 0;
         }
 
         .modal-header h3 {
@@ -116,6 +119,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           flex: 1;
           overflow-y: auto;
           padding: 32px;
+          min-height: 200px;
         }
 
         .modal-content::-webkit-scrollbar {
@@ -245,6 +249,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           color: #94A3B8;
           font-size: 14px;
           font-weight: 500;
+          flex-shrink: 0;
         }
 
         .log-count strong {
@@ -252,16 +257,32 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           font-weight: 600;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* Tablet Responsive */
+        @media (max-width: 1024px) {
+          .modal-overlay {
+            padding: 16px;
+          }
+
           .modal-box {
             max-height: 90vh;
-            border-radius: 20px 20px 0 0;
-            margin-top: auto;
+          }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .modal-overlay {
+            padding: 16px;
+            align-items: center;
+          }
+
+          .modal-box {
+            max-height: 85vh;
+            border-radius: 20px;
+            margin: auto;
           }
 
           .modal-header {
-            padding: 20px 20px;
+            padding: 20px;
           }
 
           .modal-header h3 {
@@ -272,9 +293,13 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
             padding: 20px;
           }
 
+          .log-count {
+            padding: 0 20px 12px;
+          }
+
           .logs-table th,
           .logs-table td {
-            padding: 12px 12px;
+            padding: 12px;
             font-size: 13px;
           }
 
@@ -283,10 +308,65 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           }
         }
 
-        @media (max-width: 600px) {
+        /* Small Mobile */
+        @media (max-width: 480px) {
+          .modal-overlay {
+            padding: 12px;
+          }
+
+          .modal-box {
+            max-height: 88vh;
+            border-radius: 16px;
+          }
+
+          .modal-header {
+            padding: 16px;
+          }
+
+          .modal-header h3 {
+            font-size: 18px;
+          }
+
+          .modal-header h3::before {
+            font-size: 20px;
+          }
+
+          .close-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+          }
+
+          .modal-content {
+            padding: 16px;
+          }
+
+          .log-count {
+            padding: 0 16px 12px;
+            font-size: 13px;
+          }
+
+          .logs-table th,
+          .logs-table td {
+            padding: 10px 8px;
+            font-size: 12px;
+          }
+
           .logs-table th:nth-child(4),
           .logs-table td:nth-child(4) {
             display: none;
+          }
+
+          .empty-logs {
+            padding: 40px 16px;
+          }
+
+          .empty-icon {
+            font-size: 48px;
+          }
+
+          .empty-text {
+            font-size: 16px;
           }
         }
       `}</style>

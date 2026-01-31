@@ -50,6 +50,7 @@ router.delete("/delete/:id",async(req,res)=>{
     try{
         const id=req.params.id;
         await Api.findByIdAndDelete(id);
+        await Apilogs.deleteMany({apiId:id});
         return res.status(201).json({message:"Api deleted successfully.."});
     }
     catch(error){
