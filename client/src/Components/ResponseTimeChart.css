@@ -1,0 +1,65 @@
+.response-chart-card {
+  background: #ffdeab;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+  width: 1000px;
+  min-height: 420px;              /* ✅ reserves vertical space */
+  margin-top: 24px;               /* ✅ separation from API cards */
+  margin-bottom: 24px;
+
+  display: flex;                  /* ✅ prevents collapse */
+  flex-direction: column;
+
+  position: relative;             /* ✅ avoids overlap stacking issues */
+  overflow: hidden;               /* ✅ chart never spills out */
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.response-chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
+}
+
+.response-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;                 /* ✅ header never overlaps chart */
+}
+
+.response-chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.response-chart-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.chart-wrapper {
+  flex: 1;                        /* ✅ chart fills remaining space */
+  width: 100%;
+  min-height: 300px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .response-chart-card {
+    padding: 16px;
+    min-height: 360px;
+  }
+
+  .chart-wrapper {
+    min-height: 240px;
+  }
+
+  .response-chart-title {
+    font-size: 16px;
+  }
+}

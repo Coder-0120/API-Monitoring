@@ -2,6 +2,7 @@ const express=require("express");
 const router=express();
 const Apilogs=require("../Models/apiLogModel");
 const {getResponseTimeTrend}=require("../Controllers/logController");
+router.get("/response-trend", getResponseTimeTrend);
 
 router.get("/:id",async(req,res)=>{
     try{
@@ -123,6 +124,5 @@ router.get("/downtime/:id", async (req, res) => {
   }
 });
 
-router.get("/response-trend", getResponseTimeTrend);
 
 module.exports=router;

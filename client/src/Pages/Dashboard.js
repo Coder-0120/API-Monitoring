@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ApiCard from "../Components/ApiCard";
 import axios from "axios";
+import ResponseTimeChart from "../Components/ResponseTimeChart";
 
 const Dashboard = () => {
   const [apis, setApis] = useState([]);
@@ -21,11 +22,16 @@ const Dashboard = () => {
   }, []);
 
   return (
+    <>
+    <div>
+      <ResponseTimeChart/>
+    </div>
     <div className="grid">
       {apis.map(api => (
         <ApiCard key={api._id} api={api} />
       ))}
     </div>
+      </>
   );
 };
 

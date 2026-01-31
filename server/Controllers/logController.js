@@ -1,4 +1,3 @@
-// controllers/logController.js
 const ApiLog = require("../Models/apiLogModel");
 
 const getResponseTimeTrend = async (req, res) => {
@@ -19,7 +18,8 @@ const getResponseTimeTrend = async (req, res) => {
             hour: {
               $dateToString: {
                 format: "%H:00",
-                date: "$createdAt"
+                date: "$createdAt",
+                timezone: "+05:30"   // ✅ VERY IMPORTANT (IST)
               }
             }
           },
@@ -28,14 +28,32 @@ const getResponseTimeTrend = async (req, res) => {
       },
       {
         $sort: { "_id.hour": 1 }
+      },
+      {
+        $project: {
+          _id: 0,
+          hour: "$_id.hour",
+          avgResponseTime: {
+            $round: ["$avgResponseTime", 0]
+          }
+        }
       }
     ]);
 
-    return res.status(201).json(data);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch response trend" });
+    return res.status(200).json({
+      success: true,
+      data
+    });
+
+  } catch (error) {
+    console.error("❌ Response Trend Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch response trend",
+      error: error.message
+    });
   }
 };
-module.exports = {
-  getResponseTimeTrend
-};
+
+module.exports = { getResponseTimeTrend };
