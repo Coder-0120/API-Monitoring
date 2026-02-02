@@ -1,42 +1,66 @@
-const axios=require("axios");
-const Api=require("../Models/apiModel");
-const Apilog=require("../Models/apiLogModel");
+const axios = require("axios");
+const Api = require("../Models/apiModel");
+const Apilog = require("../Models/apiLogModel");
 
-const checkApi=async()=>{
-    const AllApis=await Api.find();
-    for(let api of AllApis){
-        const start=Date.now();
-        const prevStatus=api.status;
-        let errorM=null;
-        try{
-            const response=await axios.get(api.url,{timeout:5000});
-            const time=Date.now()-start;
-            api.status="UP";
-            api.responseTime=time;
-            api.lastChecked=new Date();
-            // console.log(`Api Name is ${api.name} , api url is ${api.url} , status is ${api.status} , responsetime is ${api.responseTime} , lastChecked is ${api.lastChecked}`);
+const checkApi = async () => {
+  try {
+    const allApis = await Api.find(); // fetch fresh APIs each cycle
 
+    for (const api of allApis) {
+      const start = Date.now();
+      const prevStatus = api.status;
+      let newStatus = "DOWN";
+      let responseTime = null;
+      let errorMessage = null;
+
+      try {
+        await axios.get(api.url, { timeout: 5000 });
+        responseTime = Date.now() - start;
+        newStatus = "UP";
+      } catch (err) {
+        errorMessage = err.message;
+        newStatus = "DOWN";
+      }
+
+      try {
+        // 🔒 SAFE UPDATE (won't crash if API was deleted)
+        const updated = await Api.updateOne(
+          { _id: api._id },
+          {
+            $set: {
+              status: newStatus,
+              responseTime,
+              lastChecked: new Date()
+            }
+          }
+        );
+
+        // if API was deleted meanwhile → skip
+        if (updated.matchedCount === 0) {
+          console.warn(`API ${api._id} deleted during cron. Skipping.`);
+          continue;
         }
-        catch(error){
-            api.status="DOWN";
-            api.responseTime=null;
-            api.lastChecked=new Date();
-            errorM=error.message;
-            // console.log(`Api Name is ${api.name} , api url is ${api.url} , status is ${api.status} , responsetime is ${api.responseTime} , lastChecked is ${api.lastChecked}`);
 
+        // create log ONLY when status changes
+        if (prevStatus && prevStatus !== newStatus) {
+          await Apilog.create({
+            apiId: api._id,
+            status: newStatus,
+            responseTime,
+            Errormessage: errorMessage
+          });
+
+          console.log(`Api log created for ${api.name}`);
         }
-        await api.save();
 
-        if(prevStatus && prevStatus!==api.status){
-            await Apilog.create({
-                apiId:api._id,
-                status:api.status,
-                responseTime:api.responseTime,
-                Errormessage:errorM
-
-            })
-            console.log("Api log created")
-        }
+      } catch (dbError) {
+        console.error("DB update error:", dbError.message);
+        // do NOT throw — cron must continue
+      }
     }
-}
-module.exports=checkApi;
+  } catch (error) {
+    console.error("Cron checkApi failed:", error.message);
+  }
+};
+
+module.exports = checkApi;
