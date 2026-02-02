@@ -43,11 +43,62 @@ const ResponseTimeChart = () => {
     }
   };
 
-  // X-axis labels (hours)
-  const labels = chartData.map(item => item.hour);
+  // Process and sort data chronologically for last 24 hours
+  const processChartData = () => {
+    if (!chartData || chartData.length === 0) return { labels: [], values: [] };
 
-  // Y-axis values (avg response time)
-  const values = chartData.map(item => item.avgResponseTime);
+    // Get current hour
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    // Create array of last 24 hours in chronological order
+    // Start from 24 hours ago and go up to current hour
+    const last24Hours = [];
+    for (let i = 23; i >= 0; i--) {
+      const hour = (currentHour - i + 24) % 24;
+      last24Hours.push(hour);
+    }
+
+    // Format hour to HH:00
+    const formatHour = (hour) => {
+      return `${hour.toString().padStart(2, '0')}:00`;
+    };
+
+    // Map data to hours
+    const dataMap = {};
+    chartData.forEach(item => {
+      // Extract hour from the data
+      // Assuming item.hour is either a number (0-23) or a string like "14:00" or "2023-01-01 14:00"
+      let hour;
+      if (typeof item.hour === 'number') {
+        hour = item.hour;
+      } else if (typeof item.hour === 'string') {
+        // Try to extract hour from string
+        const match = item.hour.match(/(\d{1,2}):00/);
+        if (match) {
+          hour = parseInt(match[1]);
+        } else {
+          // If it's a datetime string, parse it
+          const date = new Date(item.hour);
+          if (!isNaN(date.getTime())) {
+            hour = date.getHours();
+          }
+        }
+      }
+      
+      if (hour !== undefined && hour >= 0 && hour <= 23) {
+        dataMap[hour] = item.avgResponseTime || 0;
+      }
+    });
+
+    // Create labels and values arrays maintaining chronological order
+    const labels = last24Hours.map(formatHour);
+    const values = last24Hours.map(hour => dataMap[hour] || null);
+
+    return { labels, values };
+  };
+
+  const { labels, values } = processChartData();
 
   const data = {
     labels,
@@ -73,6 +124,7 @@ const ResponseTimeChart = () => {
         pointHoverRadius: 6,
         pointHoverBackgroundColor: "#FF0080",
         pointHoverBorderColor: "#0B0F19",
+        spanGaps: true, // Connect points even if there are null values
       }
     ]
   };
@@ -121,7 +173,10 @@ const ResponseTimeChart = () => {
             return `Time: ${context[0].label}`;
           },
           label: (context) => {
-            return `Response Time: ${context.parsed.y} ms`;
+            if (context.parsed.y === null) {
+              return 'No data';
+            }
+            return `Response Time: ${context.parsed.y.toFixed(2)} ms`;
           }
         }
       }
@@ -170,12 +225,20 @@ const ResponseTimeChart = () => {
         ticks: {
           color: '#64748B',
           font: {
-            size: 12,
+            size: 11,
             family: "'Outfit', sans-serif"
           },
           padding: 8,
           maxRotation: 45,
-          minRotation: 0
+          minRotation: 0,
+          autoSkip: false, // Show all labels
+          callback: function(value, index) {
+            // Show every 2nd hour to avoid crowding
+            if (index % 2 === 0) {
+              return this.getLabelForValue(value);
+            }
+            return '';
+          }
         },
         title: {
           display: true,
@@ -195,6 +258,13 @@ const ResponseTimeChart = () => {
       intersect: false,
     }
   };
+
+  // Calculate stats only from non-null values
+  const validValues = values.filter(v => v !== null);
+  const peak = validValues.length > 0 ? Math.max(...validValues) : 0;
+  const average = validValues.length > 0 
+    ? validValues.reduce((a, b) => a + b, 0) / validValues.length 
+    : 0;
 
   return (
     <>
@@ -375,18 +445,18 @@ const ResponseTimeChart = () => {
             </div>
           </div>
 
-          {!loading && chartData.length > 0 && (
+          {!loading && validValues.length > 0 && (
             <div className="chart-stats">
               <div className="stat-item">
                 <div className="stat-label">Peak</div>
                 <div className="stat-value">
-                  {Math.max(...values).toFixed(0)} ms
+                  {peak.toFixed(0)} ms
                 </div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">Average</div>
                 <div className="stat-value">
-                  {(values.reduce((a, b) => a + b, 0) / values.length).toFixed(0)} ms
+                  {average.toFixed(0)} ms
                 </div>
               </div>
             </div>
