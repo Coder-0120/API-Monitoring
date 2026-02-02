@@ -2,6 +2,7 @@ const express=require('express');
 const router=express.Router();
 const Api=require("../Models/apiModel");
 const Apilogs=require("../Models/apiLogModel");
+const mongoose=require("mongoose");
 
 // to add api in db
 router.post("/add",async(req,res)=>{
@@ -11,8 +12,8 @@ router.post("/add",async(req,res)=>{
         if(existApi){
             return res.status(400).json({message:"Api already exist"});
         }
-        await Api.create({name,url,status,responseTime,lastChecked});
-        return res.status(201).json({message:"Api created successfully.."});
+        const newApi=await Api.create({name,url,status:'UP',responseTime,lastChecked});
+        return res.status(201).json({message:"Api created successfully..",data:newApi});
     }
     catch(error){
         return res.status(400).json({message:"Internal Server error"});
@@ -45,18 +46,34 @@ router.get("/get/:id",async(req,res)=>{
     }
 })
 
-// to delete api 
-router.delete("/delete/:id",async(req,res)=>{
-    try{
-        const id=req.params.id;
-        await Api.findByIdAndDelete(id);
-        await Apilogs.deleteMany({apiId:id});
-        return res.status(201).json({message:"Api deleted successfully.."});
+// delete api
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid API id" });
     }
-    catch(error){
-        return res.status(400).json({message:"Internal Server error"});
+
+    const deletedApi = await Api.findByIdAndDelete(id);
+
+    if (!deletedApi) {
+      return res.status(404).json({ message: "API not found" });
     }
-})
+
+    await Apilogs.deleteMany({ apiId: id });
+
+    return res.status(200).json({
+      success: true,
+      message: "API deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Delete API crash:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 
 module.exports=router;

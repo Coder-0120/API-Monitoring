@@ -6,6 +6,11 @@ import ResponseTimeChart from "../Components/ResponseTimeChart";
 const Dashboard = () => {
   const [apis, setApis] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newApi, setNewApi] = useState({
+    name: "",
+    url: ""
+  });
 
   const fetchApis = async () => {
     try {
@@ -34,10 +39,37 @@ const Dashboard = () => {
       // Call your backend delete endpoint
       await axios.delete(`http://localhost:5000/api/monitor/delete/${apiId}`);
       // Remove from state
+      alert("API endpoint deleted successfully!");
       setApis(apis.filter(api => api._id !== apiId));
     } catch (error) {
       console.error("Error deleting API:", error);
       alert("Failed to delete endpoint. Please try again.");
+    }
+  };
+
+  // Handle add new API
+  const handleAddApi = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/monitor/add", newApi);
+      setApis([...apis, res.data.data]);
+      setNewApi({ name: "", url: ""});
+      setShowAddForm(false);
+      alert("API endpoint added successfully!");
+    } catch (error) {
+      console.error("Error adding API:", error);
+      alert("Failed to add endpoint. Please try again.");
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Add your logout logic here (clear tokens, redirect, etc.)
+    if (window.confirm("Are you sure you want to logout?")) {
+      // Clear any stored tokens/data
+      localStorage.removeItem("token");
+      // Redirect to login page or home
+      window.location.href = "/login";
     }
   };
 
@@ -95,6 +127,61 @@ const Dashboard = () => {
           }
         }
 
+        .top-bar {
+          max-width: 1400px;
+          margin: 0 auto 32px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+          position: relative;
+          z-index: 1;
+          animation: fadeInDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 12px;
+        }
+
+        .btn {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 12px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, #00F0FF, #0080FF);
+          color: #0B0F19;
+          border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-logout {
+          background: rgba(239, 68, 68, 0.1);
+          color: #EF4444;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-logout:hover {
+          background: rgba(239, 68, 68, 0.2);
+          border-color: #EF4444;
+          transform: translateY(-2px);
+        }
+
         .dashboard-header {
           max-width: 1400px;
           margin: 0 auto 40px;
@@ -129,6 +216,153 @@ const Dashboard = () => {
           font-size: 16px;
           color: #94A3B8;
           font-weight: 400;
+        }
+
+        /* Add API Form Modal */
+        .form-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(11, 15, 25, 0.85);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 20px;
+          animation: overlayFadeIn 0.3s ease-out;
+        }
+
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .form-modal {
+          background: #151B2B;
+          border: 1px solid rgba(148, 163, 184, 0.15);
+          border-radius: 24px;
+          width: 100%;
+          max-width: 500px;
+          padding: 32px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+        }
+
+        @keyframes modalSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        .form-modal::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, #00F0FF, #FF0080, transparent);
+          opacity: 0.8;
+        }
+
+        .form-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .form-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: #F8FAFC;
+        }
+
+        .close-btn {
+          width: 36px;
+          height: 36px;
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 10px;
+          color: #EF4444;
+          font-size: 18px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .close-btn:hover {
+          background: rgba(239, 68, 68, 0.2);
+          border-color: #EF4444;
+          transform: rotate(90deg);
+        }
+
+        .form-group {
+          margin-bottom: 20px;
+        }
+
+        .form-label {
+          display: block;
+          font-size: 14px;
+          font-weight: 600;
+          color: #94A3B8;
+          margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+          width: 100%;
+          padding: 12px 16px;
+          background: rgba(30, 39, 56, 0.5);
+          border: 1px solid rgba(148, 163, 184, 0.2);
+          border-radius: 10px;
+          color: #F8FAFC;
+          font-family: 'Outfit', sans-serif;
+          font-size: 14px;
+          transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+          outline: none;
+          border-color: #00F0FF;
+          box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+        }
+
+        .form-actions {
+          display: flex;
+          gap: 12px;
+          margin-top: 24px;
+        }
+
+        .btn-submit {
+          flex: 1;
+          background: linear-gradient(135deg, #00F0FF, #0080FF);
+          color: #0B0F19;
+          border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-cancel {
+          flex: 1;
+          background: rgba(148, 163, 184, 0.1);
+          color: #94A3B8;
+          border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .btn-cancel:hover {
+          background: rgba(148, 163, 184, 0.2);
+          color: #F8FAFC;
         }
 
         .dashboard-stats {
@@ -281,6 +515,20 @@ const Dashboard = () => {
             padding: 24px 16px;
           }
 
+          .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .action-buttons {
+            width: 100%;
+          }
+
+          .btn {
+            flex: 1;
+            justify-content: center;
+          }
+
           .dashboard-title {
             font-size: 32px;
           }
@@ -294,15 +542,84 @@ const Dashboard = () => {
             grid-template-columns: 1fr;
             gap: 16px;
           }
+
+          .form-modal {
+            padding: 24px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .dashboard-stats {
+            grid-template-columns: 1fr;
+          }
+
+          .btn {
+            font-size: 13px;
+            padding: 10px 16px;
+          }
         }
       `}</style>
 
       <div className="dashboard-container">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">API Monitor Dashboard</h1>
-          <p className="dashboard-subtitle">Real-time monitoring and analytics</p>
+        <div className="top-bar">
+          <div className="dashboard-header" style={{ margin: 0 }}>
+            <h1 className="dashboard-title">API Monitor Dashboard</h1>
+            <p className="dashboard-subtitle">Real-time monitoring and analytics</p>
+          </div>
+          <div className="action-buttons">
+            <button className="btn btn-primary" onClick={() => setShowAddForm(true)}>
+              <span>➕</span> Add New API
+            </button>
+            <button className="btn btn-logout" onClick={handleLogout}>
+              <span>🚪</span> Logout
+            </button>
+          </div>
         </div>
-       
+
+        {showAddForm && (
+          <div className="form-overlay" onClick={() => setShowAddForm(false)}>
+            <div className="form-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="form-header">
+                <h2 className="form-title">Add New API Endpoint</h2>
+                <button className="close-btn" onClick={() => setShowAddForm(false)}>
+                  ✖
+                </button>
+              </div>
+              <form onSubmit={handleAddApi}>
+                <div className="form-group">
+                  <label className="form-label">API Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g., My API"
+                    value={newApi.name}
+                    onChange={(e) => setNewApi({ ...newApi, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">API URL</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder="https://api.example.com/endpoint"
+                    value={newApi.url}
+                    onChange={(e) => setNewApi({ ...newApi, url: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-submit">
+                    Add API
+                  </button>
+                  <button type="button" className="btn btn-cancel" onClick={() => setShowAddForm(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         <div className="dashboard-stats">
           <div className="stat-card">

@@ -12,13 +12,13 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           bottom: 0;
           background: rgba(11, 15, 25, 0.85);
           backdrop-filter: blur(8px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
           z-index: 1000;
           padding: 20px;
           animation: overlayFadeIn 0.3s ease-out;
           overflow-y: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         @keyframes overlayFadeIn {
@@ -36,14 +36,14 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           border-radius: 24px;
           width: 100%;
           max-width: 900px;
-          max-height: 85vh;
+          max-height: calc(100vh - 40px);
           display: flex;
           flex-direction: column;
           box-shadow: 
             0 20px 60px rgba(0, 0, 0, 0.5),
             0 0 0 1px rgba(255, 255, 255, 0.02);
           animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          position: relative;
+          position: fixed;
           overflow: hidden;
           margin: auto;
         }
@@ -260,11 +260,19 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
         /* Tablet Responsive */
         @media (max-width: 1024px) {
           .modal-overlay {
-            padding: 16px;
+            padding: 20px;
           }
 
           .modal-box {
-            max-height: 90vh;
+            max-height: calc(100vh - 40px);
+          }
+
+          .modal-header {
+            padding: 24px 28px;
+          }
+
+          .modal-content {
+            padding: 28px;
           }
         }
 
@@ -272,17 +280,15 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
         @media (max-width: 768px) {
           .modal-overlay {
             padding: 16px;
-            align-items: center;
           }
 
           .modal-box {
-            max-height: 85vh;
+            max-height: calc(100vh - 32px);
             border-radius: 20px;
-            margin: auto;
           }
 
           .modal-header {
-            padding: 20px;
+            padding: 20px 24px;
           }
 
           .modal-header h3 {
@@ -290,16 +296,16 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           }
 
           .modal-content {
-            padding: 20px;
+            padding: 24px;
           }
 
           .log-count {
-            padding: 0 20px 12px;
+            padding: 0 24px 12px;
           }
 
           .logs-table th,
           .logs-table td {
-            padding: 12px;
+            padding: 12px 16px;
             font-size: 13px;
           }
 
@@ -315,12 +321,12 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           }
 
           .modal-box {
-            max-height: 88vh;
+            max-height: calc(100vh - 24px);
             border-radius: 16px;
           }
 
           .modal-header {
-            padding: 16px;
+            padding: 16px 20px;
           }
 
           .modal-header h3 {
@@ -338,17 +344,17 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           }
 
           .modal-content {
-            padding: 16px;
+            padding: 20px;
           }
 
           .log-count {
-            padding: 0 16px 12px;
+            padding: 0 20px 12px;
             font-size: 13px;
           }
 
           .logs-table th,
           .logs-table td {
-            padding: 10px 8px;
+            padding: 10px 12px;
             font-size: 12px;
           }
 
@@ -367,6 +373,10 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
 
           .empty-text {
             font-size: 16px;
+          }
+
+          .error-cell {
+            max-width: 100px;
           }
         }
       `}</style>
