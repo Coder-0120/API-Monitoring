@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 connectDB();
 cron.schedule("*/1 * * * *", () => {
-//   console.log("Checking APIs...");
+  console.log("Checking APIs...");
   checkApi();
 });
 app.get('/',(req,res)=>{
