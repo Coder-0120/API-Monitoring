@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -6,10 +7,22 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try{
+
+      await axios.post("http:localhost:5000/api/user/create",{
+        name,email,password
+      });
+      console.log("User Registered Successfully..");
+
+    }
+    catch(err){
+      console.log("Error in registering user",err);
+      alert(err);
+    }
+
     console.log('Signup:', { name, email, password });
-    // Add your signup logic here
   };
 
   return (
