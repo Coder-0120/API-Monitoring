@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate=useNavigate();
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -14,6 +16,9 @@ export default function Login() {
         email,password
       });
       alert("login successfully..");
+      localStorage.setItem("userInfo",JSON.stringify(email));
+      navigate("/");
+
     }
     catch(err){
       alert("login failed");

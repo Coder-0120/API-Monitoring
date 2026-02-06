@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate=useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +17,8 @@ export default function Signup() {
         name,email,password
       });
       console.log("User Registered Successfully..");
+      alert("register done..");
+      navigate("/login");
 
     }
     catch(err){
