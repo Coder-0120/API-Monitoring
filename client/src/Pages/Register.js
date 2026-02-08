@@ -13,7 +13,7 @@ export default function Signup() {
     e.preventDefault();
     try{
 
-      await axios.post("http:localhost:5000/api/user/create",{
+      await axios.post("http://localhost:5000/api/user/create",{
         name,email,password
       });
       console.log("User Registered Successfully..");
@@ -523,7 +523,7 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength="8"
+                minLength="4"
               />
               <button
                 type="button"

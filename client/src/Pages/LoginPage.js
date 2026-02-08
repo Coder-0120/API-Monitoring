@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault();
     try{
 
-      await axios.post("http:localhost:5000/api/user/login",{
+      await axios.post("http://localhost:5000/api/user/login",{
         email,password
       });
       alert("login successfully..");
@@ -522,7 +522,7 @@ export default function Login() {
         <div className="auth-footer">
           <p className="auth-footer-text">
             Don't have an account?
-            <a href="/signup" className="auth-link">
+            <a href="/register" className="auth-link">
               Sign up
             </a>
           </p>
