@@ -31,17 +31,26 @@ const ResponseTimeChart = () => {
   }, []);
 
   const fetchResponseTrend = async () => {
-    try {
-      const res = await axios.get(
-        "http://localhost:5000/api/logs/response-trend"
-      );
-      setChartData(res.data.data);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching response trend", err);
-      setLoading(false);
-    }
-  };
+  try {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const userId = userInfo.userId;
+    // console.log("Fetching response trend for userId:", userId);
+
+    const res = await axios.get(
+      "http://localhost:5000/api/logs/response-trend",
+      {
+        params: { userId }
+      }
+    );
+
+    setChartData(res.data.data);
+    setLoading(false);
+  } catch (err) {
+    console.error("Error fetching response trend", err);
+    setLoading(false);
+  }
+};
+
 
   // Process and sort data chronologically for last 24 hours
   const processChartData = () => {
@@ -279,7 +288,6 @@ const ResponseTimeChart = () => {
           position: relative;
           overflow: hidden;
         }
-
         .response-chart-card::before {
           content: '';
           position: absolute;

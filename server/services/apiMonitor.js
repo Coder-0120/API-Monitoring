@@ -45,6 +45,7 @@ const checkApi = async () => {
         if (prevStatus && prevStatus !== newStatus) {
           await Apilog.create({
             apiId: api._id,
+            userId: api.userId,
             status: newStatus,
             responseTime,
             Errormessage: errorMessage

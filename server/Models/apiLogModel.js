@@ -5,6 +5,11 @@ const apilogSchema=new mongoose.Schema({
         ref:"Api",
         required:true
     },
+     userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
     status:{
         type:String,
         enum:["UP","DOWN"],
