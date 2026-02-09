@@ -1,5 +1,5 @@
 const axios = require("axios");
-const Api = require("../Models/apiModel");
+const Api = require("../Models/apiModels");
 const Apilog = require("../Models/apiLogModel");
 
 const checkApi = async () => {

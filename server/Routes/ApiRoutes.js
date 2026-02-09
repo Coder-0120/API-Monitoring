@@ -1,29 +1,30 @@
 const express=require('express');
 const router=express.Router();
-const Api=require("../Models/apiModel");
+const Api=require("../Models/apiModels");
 const Apilogs=require("../Models/apiLogModel");
 const mongoose=require("mongoose");
 
 // to add api in db
 router.post("/add",async(req,res)=>{
     try{
-        const{name,url,status,responseTime,lastChecked}=req.body;
-        const existApi=await Api.findOne({url});
-        if(existApi){
-            return res.status(400).json({message:"Api already exist"});
-        }
-        const newApi=await Api.create({name,url,status:'UP',responseTime,lastChecked});
+        const{name,url,status,responseTime,lastChecked,userId}=req.body;
+        // const existApi=await Api.findOne({url});
+        // if(existApi){
+        //     return res.status(400).json({message:"Api already exist"});
+        // }
+        const newApi=await Api.create({name,url,status:'UP',responseTime,lastChecked,userId});
         return res.status(201).json({message:"Api created successfully..",data:newApi});
     }
     catch(error){
-        return res.status(400).json({message:"Internal Server error"});
+        return res.status(400).json({message:"Internal Server error",error:error.message});
     }
 })
 
 // to get all api 
-router.get("/getall",async(req,res)=>{
+router.get("/getall/:userId",async(req,res)=>{
     try{
-        const api=await Api.find().sort({createdAt:-1});
+        const {userId}=req.params;
+        const api=await Api.find({userId}).sort({createdAt:-1});
         return res.status(201).json({message:"Api fetched successfully..",data:api});
     }
     catch(error){

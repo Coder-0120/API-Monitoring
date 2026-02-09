@@ -7,14 +7,16 @@ const Dashboard = () => {
   const [apis, setApis] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const userInfo=JSON.parse(localStorage.getItem("userInfo"));
   const [newApi, setNewApi] = useState({
     name: "",
-    url: ""
+    url: "",
+    userId: userInfo?.userId || ""
   });
 
   const fetchApis = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/monitor/getAll");
+      const res = await axios.get(`http://localhost:5000/api/monitor/getAll/${userInfo.userId}`);
       setApis(res.data.data);
       setLoading(false);
     } catch (error) {
@@ -563,7 +565,8 @@ const Dashboard = () => {
       <div className="dashboard-container">
         <div className="top-bar">
           <div className="dashboard-header" style={{ margin: 0 }}>
-            <h1 className="dashboard-title">API Monitor Dashboard</h1>
+            <h1 className="dashboard-title">Welcome {userInfo?.user || "User"}! </h1>
+            <h1 className="dashboard-titl">API Monitor Dashboard </h1>
             <p className="dashboard-subtitle">Real-time monitoring and analytics</p>
           </div>
           <div className="action-buttons">

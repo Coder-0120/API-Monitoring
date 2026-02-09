@@ -19,7 +19,7 @@ const getResponseTimeTrend = async (req, res) => {
               $dateToString: {
                 format: "%H:00",
                 date: "$createdAt",
-                timezone: "+05:30"   // ✅ VERY IMPORTANT (IST)
+                timezone: "+05:30"   
               }
             }
           },

@@ -12,11 +12,11 @@ export default function Login() {
     e.preventDefault();
     try{
 
-      await axios.post("http://localhost:5000/api/user/login",{
+      const response=await axios.post("http://localhost:5000/api/user/login",{
         email,password
       });
       alert("login successfully..");
-      localStorage.setItem("userInfo",JSON.stringify(email));
+      localStorage.setItem("userInfo",JSON.stringify(response.data.data));
       navigate("/");
 
     }

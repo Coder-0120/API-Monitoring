@@ -1,5 +1,10 @@
 const mongoose=require("mongoose");
 const apiSchema =new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     name:{
         type:String,
         required:true,
@@ -8,7 +13,6 @@ const apiSchema =new mongoose.Schema({
     url:{
         type:String,
         required:true,
-        unique:true
     },
     status:{
         type:String,
@@ -26,6 +30,7 @@ const apiSchema =new mongoose.Schema({
 },{
     timestamps:true
 });
+
 
 
 module.exports=mongoose.model("Api",apiSchema);
