@@ -1,4 +1,40 @@
+import { useEffect, useRef } from "react";
+
 const ApiLogsModal = ({ show, onClose, logs }) => {
+  const modalContentRef = useRef(null);
+
+  useEffect(() => {
+    if (show) {
+      // Scroll whole page to top smoothly
+      window.scrollTo({
+        top: 1000,
+        behavior: "smooth",
+      });
+
+      // Disable background scrolling
+      // document.body.style.overflow = "hidden";
+
+      // Scroll modal content to top
+      if (modalContentRef.current) {
+        modalContentRef.current.scrollTop = 0;
+      }
+
+      // Close on ESC key
+      const handleEsc = (e) => {
+        if (e.key === "Escape") {
+          onClose();
+        }
+      };
+
+      window.addEventListener("keydown", handleEsc);
+
+      return () => {
+        window.removeEventListener("keydown", handleEsc);
+        document.body.style.overflow = "auto";
+      };
+    }
+  }, [show, onClose]);
+
   if (!show) return null;
 
   return (
@@ -22,12 +58,8 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
         }
 
         @keyframes overlayFadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
         .modal-box {
@@ -43,9 +75,8 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
             0 20px 60px rgba(0, 0, 0, 0.5),
             0 0 0 1px rgba(255, 255, 255, 0.02);
           animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          position: fixed;
           overflow: hidden;
-          margin: auto;
+          position: relative;
         }
 
         @keyframes modalSlideUp {
@@ -106,7 +137,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s;
         }
 
         .close-btn:hover {
@@ -115,45 +146,21 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           transform: rotate(90deg);
         }
 
+        .log-count {
+          padding: 16px 32px 0;
+          color: #94A3B8;
+          font-size: 14px;
+          font-weight: 500;
+        }
+
+        .log-count strong {
+          color: #00F0FF;
+        }
+
         .modal-content {
           flex: 1;
           overflow-y: auto;
           padding: 32px;
-          min-height: 200px;
-        }
-
-        .modal-content::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        .modal-content::-webkit-scrollbar-track {
-          background: rgba(30, 39, 56, 0.3);
-        }
-
-        .modal-content::-webkit-scrollbar-thumb {
-          background: rgba(0, 240, 255, 0.3);
-          border-radius: 4px;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 240, 255, 0.5);
-        }
-
-        .empty-logs {
-          text-align: center;
-          padding: 60px 20px;
-          color: #64748B;
-        }
-
-        .empty-icon {
-          font-size: 64px;
-          margin-bottom: 16px;
-          opacity: 0.5;
-        }
-
-        .empty-text {
-          font-size: 18px;
-          font-weight: 500;
         }
 
         .logs-table-wrapper {
@@ -175,15 +182,18 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           z-index: 10;
         }
 
-        .logs-table th {
-          padding: 16px 20px;
+        .logs-table th,
+        .logs-table td {
+          padding: 14px 18px;
           text-align: left;
-          font-size: 13px;
-          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .logs-table th {
           color: #94A3B8;
           text-transform: uppercase;
+          font-size: 12px;
           letter-spacing: 0.05em;
-          border-bottom: 1px solid rgba(148, 163, 184, 0.15);
         }
 
         .logs-table tbody tr {
@@ -195,33 +205,18 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
           background: rgba(0, 240, 255, 0.05);
         }
 
-        .logs-table tbody tr:last-child {
-          border-bottom: none;
-        }
-
-        .logs-table td {
-          padding: 16px 20px;
-          font-size: 14px;
-          color: #F8FAFC;
-        }
-
-        .status-cell {
-          font-weight: 600;
-          text-transform: uppercase;
-          font-size: 12px;
-          letter-spacing: 0.05em;
-        }
-
         .status-cell.up {
           color: #10B981;
+          font-weight: 600;
         }
 
         .status-cell.down {
           color: #EF4444;
+          font-weight: 600;
         }
 
         .response-time-cell {
-          font-family: 'JetBrains Mono', monospace;
+          font-family: monospace;
           color: #00F0FF;
         }
 
@@ -233,161 +228,37 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
         .error-cell {
           color: #F59E0B;
           font-size: 13px;
-          max-width: 300px;
+          max-width: 250px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
-        .error-cell:empty::before {
-          content: '—';
+        .empty-logs {
+          text-align: center;
+          padding: 60px 20px;
           color: #64748B;
         }
 
-        .log-count {
-          padding: 0 32px 16px;
-          color: #94A3B8;
-          font-size: 14px;
+        .empty-icon {
+          font-size: 64px;
+          margin-bottom: 16px;
+          opacity: 0.5;
+        }
+
+        .empty-text {
+          font-size: 18px;
           font-weight: 500;
-          flex-shrink: 0;
         }
-
-        .log-count strong {
-          color: #00F0FF;
-          font-weight: 600;
-        }
-
-        /* Tablet Responsive */
-        @media (max-width: 1024px) {
-          .modal-overlay {
-            padding: 20px;
-          }
-
-          .modal-box {
-            max-height: calc(100vh - 40px);
-          }
-
-          .modal-header {
-            padding: 24px 28px;
-          }
-
-          .modal-content {
-            padding: 28px;
-          }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-          .modal-overlay {
-            padding: 16px;
-          }
-
-          .modal-box {
-            max-height: calc(100vh - 32px);
-            border-radius: 20px;
-          }
-
-          .modal-header {
-            padding: 20px 24px;
-          }
-
-          .modal-header h3 {
-            font-size: 20px;
-          }
-
-          .modal-content {
-            padding: 24px;
-          }
-
-          .log-count {
-            padding: 0 24px 12px;
-          }
-
-          .logs-table th,
-          .logs-table td {
-            padding: 12px 16px;
-            font-size: 13px;
-          }
-
-          .error-cell {
-            max-width: 150px;
-          }
-        }
-
-        /* Small Mobile */
-        @media (max-width: 480px) {
-          .modal-overlay {
-            padding: 12px;
-          }
-
-          .modal-box {
-            max-height: calc(100vh - 24px);
-            border-radius: 16px;
-          }
-
-          .modal-header {
-            padding: 16px 20px;
-          }
-
-          .modal-header h3 {
-            font-size: 18px;
-          }
-
-          .modal-header h3::before {
-            font-size: 20px;
-          }
-
-          .close-btn {
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
-          }
-
-          .modal-content {
-            padding: 20px;
-          }
-
-          .log-count {
-            padding: 0 20px 12px;
-            font-size: 13px;
-          }
-
-          .logs-table th,
-          .logs-table td {
-            padding: 10px 12px;
-            font-size: 12px;
-          }
-
-          .logs-table th:nth-child(4),
-          .logs-table td:nth-child(4) {
-            display: none;
-          }
-
-          .empty-logs {
-            padding: 40px 16px;
-          }
-
-          .empty-icon {
-            font-size: 48px;
-          }
-
-          .empty-text {
-            font-size: 16px;
-          }
-
-          .error-cell {
-            max-width: 100px;
-          }
-        }
-      `}</style>
+          
+      `
+      }</style>
 
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-box" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h3>API Logs</h3>
-            <button className="close-btn" onClick={onClose}>
-              ✖
-            </button>
+            <button className="close-btn" onClick={onClose}>✖</button>
           </div>
 
           {logs.length > 0 && (
@@ -396,7 +267,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
             </div>
           )}
 
-          <div className="modal-content">
+          <div className="modal-content" ref={modalContentRef}>
             {logs.length === 0 ? (
               <div className="empty-logs">
                 <div className="empty-icon">📭</div>
@@ -416,10 +287,8 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
                   <tbody>
                     {logs.map((log) => (
                       <tr key={log._id}>
-                        <td>
-                          <span className={`status-cell ${log.status === "UP" ? "up" : "down"}`}>
-                            {log.status}
-                          </span>
+                        <td className={`status-cell ${log.status === "UP" ? "up" : "down"}`}>
+                          {log.status}
                         </td>
                         <td className="response-time-cell">
                           {log.responseTime ?? "--"} ms
@@ -428,7 +297,7 @@ const ApiLogsModal = ({ show, onClose, logs }) => {
                           {new Date(log.createdAt).toLocaleString()}
                         </td>
                         <td className="error-cell" title={log.Errormessage}>
-                          {log.Errormessage}
+                          {log.Errormessage || "—"}
                         </td>
                       </tr>
                     ))}
