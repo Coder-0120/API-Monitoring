@@ -4,6 +4,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Login from './Pages/LoginPage';
 import Register from './Pages/Register';
 import { Navigate } from 'react-router-dom';
+import HomePage from './Pages/HomePage';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -16,10 +17,11 @@ function App() {
    <>
    <Router>
     <Routes>
-      <Route path='/' element={<ProtectedRoute><Dashboard/></ProtectedRoute>}/>
+      <Route path='/' element={<HomePage/>}/>
+      <Route path='/dashboard' element={<ProtectedRoute><Dashboard/></ProtectedRoute>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/register' element={<Register/>}/>
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
 
     </Routes>
    </Router>

@@ -17,7 +17,7 @@ export default function Login() {
       });
       alert("login successfully..");
       localStorage.setItem("userInfo",JSON.stringify(response.data.data));
-      navigate("/");
+      navigate("/dashboard");
 
     }
     catch(err){
